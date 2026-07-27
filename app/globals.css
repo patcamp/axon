@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lock the document to the viewport so iOS can't scroll the whole
+   page (and drag the header off-screen) when the keyboard opens in
+   standalone/PWA mode — only .chat-scroll should ever scroll. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
