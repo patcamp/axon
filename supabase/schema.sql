@@ -58,35 +58,7 @@ create unique index projects_one_builtin_per_user on projects(user_id) where is_
 -- Starred chats, surfaced in a "Favorites" sidebar section.
 alter table conversations add column is_favorite boolean not null default false;
 
--- Personal access tokens for the VS Code extension. Only a SHA-256 hash
--- is ever stored; the plaintext is shown once at creation and never
--- persisted or logged.
-create table access_tokens (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
-  token_hash text not null unique,
-  name text not null default 'VS Code extension',
-  created_at timestamptz not null default now(),
-  last_used_at timestamptz
-);
-
-alter table access_tokens enable row level security;
-
-create policy "Own select" on access_tokens for select using (auth.uid() = user_id);
-create policy "Own insert" on access_tokens for insert with check (auth.uid() = user_id);
-create policy "Own delete" on access_tokens for delete using (auth.uid() = user_id);
-
--- Used only by /api/agent to resolve a bearer token to a user without an
--- active Supabase session. security definer, so it runs with owner
--- privileges for this one narrow lookup+touch — the anon key alone
--- cannot otherwise read this table unscoped (no service-role key needed
--- anywhere in this app).
-create function public.verify_access_token(p_hash text) returns uuid
-language plpgsql security definer set search_path = public as $$
-declare v_user_id uuid;
-begin
-  update access_tokens set last_used_at = now()
-    where token_hash = p_hash
-    returning user_id into v_user_id;
-  return v_user_id;
-end $$;
+-- To drop the retired VS Code extension's access-token support from an
+-- existing database, run:
+--   drop function if exists public.verify_access_token(text);
+--   drop table if exists access_tokens;

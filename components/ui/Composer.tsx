@@ -27,7 +27,7 @@ export default function Composer({
             }
           }}
           rows={1}
-          placeholder="Message…  (Enter to send, Shift+Enter for a new line)"
+          placeholder="Message…"
           className={styles.chat.textarea}
         />
         <Button size="lg" onClick={onSend} disabled={disabled || !value.trim()}>

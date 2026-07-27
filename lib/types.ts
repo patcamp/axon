@@ -16,14 +16,6 @@ export interface Project {
   created_at: string;
 }
 
-export interface AccessToken {
-  id: string;
-  user_id: string;
-  name: string;
-  created_at: string;
-  last_used_at: string | null;
-}
-
 export interface Message {
   id: string;
   conversation_id: string;

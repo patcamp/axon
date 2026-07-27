@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { AuthSession } from "@/components/api/auth";
 import { styles } from "./styles";
 
@@ -27,10 +26,6 @@ export default function AccountFooter({
       {open && (
         <div className={[styles.menu.panel, styles.menu.panelAbove].join(" ")}>
           <p className={styles.menu.header}>{session.user.email}</p>
-          <div className={styles.menu.divider} />
-          <Link href="/code" onClick={() => setOpen(false)} className={styles.menu.item}>
-            Code
-          </Link>
           <div className={styles.menu.divider} />
           <button
             onClick={() => {
