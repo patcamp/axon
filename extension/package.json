@@ -15,6 +15,24 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "axon",
+          "title": "Axon",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "axon": [
+        {
+          "type": "webview",
+          "id": "axon.sessionsView",
+          "name": "Sessions"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "axon.openAssistant",
@@ -38,7 +56,7 @@
     }
   },
   "scripts": {
-    "compile": "tsc -p ./ && mkdir -p out/webview && cp src/webview/main.js src/webview/styles.css out/webview/",
+    "compile": "tsc -p ./ && mkdir -p out/webview && cp -r src/webview/* out/webview/",
     "vscode:prepublish": "npm run compile"
   },
   "dependencies": {

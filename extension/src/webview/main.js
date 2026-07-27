@@ -108,6 +108,8 @@
       appendMessage("error", message.message);
     } else if (message.type === "changelog") {
       renderChangelog(message.entries);
+    } else if (message.type === "history") {
+      message.messages.forEach((m) => appendMessage(m.role, m.content));
     }
   });
 

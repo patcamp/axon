@@ -4,6 +4,7 @@ import { callAgent, AgentAuthError, AgentNetworkError } from "./agentClient";
 import { gatherContext } from "./context";
 import { applyEdits } from "./applyEdits";
 import { Changelog, ChangelogEntry } from "./changelog";
+import { SessionStore } from "./sessionStore";
 
 function getWebviewHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const scriptUri = webview.asWebviewUri(
@@ -51,20 +52,23 @@ function serializeEntry(entry: ChangelogEntry) {
 }
 
 export class AxonPanel {
-  public static current: AxonPanel | undefined;
+  private static panels = new Map<string, AxonPanel>();
 
   private readonly panel: vscode.WebviewPanel;
   private readonly changelog = new Changelog();
   private readonly disposables: vscode.Disposable[] = [];
 
-  static createOrShow(extensionUri: vscode.Uri) {
-    if (AxonPanel.current) {
-      AxonPanel.current.panel.reveal();
+  static open(extensionUri: vscode.Uri, sessionStore: SessionStore, sessionId: string) {
+    const existing = AxonPanel.panels.get(sessionId);
+    if (existing) {
+      existing.panel.reveal();
       return;
     }
+
+    const session = sessionStore.get(sessionId);
     const panel = vscode.window.createWebviewPanel(
       "axonAssistant",
-      "Axon Assistant",
+      session?.title ?? "New chat",
       vscode.ViewColumn.Beside,
       {
         enableScripts: true,
@@ -72,12 +76,23 @@ export class AxonPanel {
         localResourceRoots: [vscode.Uri.joinPath(extensionUri, "out")],
       }
     );
-    AxonPanel.current = new AxonPanel(panel, extensionUri);
+    const instance = new AxonPanel(panel, extensionUri, sessionStore, sessionId);
+    AxonPanel.panels.set(sessionId, instance);
   }
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+  private constructor(
+    panel: vscode.WebviewPanel,
+    extensionUri: vscode.Uri,
+    private readonly sessionStore: SessionStore,
+    private readonly sessionId: string
+  ) {
     this.panel = panel;
     this.panel.webview.html = getWebviewHtml(this.panel.webview, extensionUri);
+
+    const session = sessionStore.get(sessionId);
+    if (session && session.messages.length > 0) {
+      this.panel.webview.postMessage({ type: "history", messages: session.messages });
+    }
 
     this.panel.webview.onDidReceiveMessage(
       (message) => this.handleMessage(message),
@@ -100,10 +115,17 @@ export class AxonPanel {
     const backendUrl = config.get<string>("backendUrl", "");
     const token = config.get<string>("token", "");
 
+    await this.sessionStore.appendMessage(this.sessionId, { role: "user", content: text });
+    this.syncTitle();
+
     try {
       const context = gatherContext();
       const result = await callAgent(backendUrl, token, text, context);
       this.panel.webview.postMessage({ type: "reply", reply: result.reply });
+      await this.sessionStore.appendMessage(this.sessionId, {
+        role: "assistant",
+        content: result.reply,
+      });
 
       if (result.edits.length > 0) {
         const files = await applyEdits(result.edits);
@@ -122,6 +144,11 @@ export class AxonPanel {
     } catch (err) {
       this.handleError(err);
     }
+  }
+
+  private syncTitle() {
+    const session = this.sessionStore.get(this.sessionId);
+    if (session) this.panel.title = session.title;
   }
 
   private handleError(err: unknown) {
@@ -143,7 +170,7 @@ export class AxonPanel {
   }
 
   private dispose() {
-    AxonPanel.current = undefined;
+    AxonPanel.panels.delete(this.sessionId);
     this.disposables.forEach((d) => d.dispose());
   }
 }
