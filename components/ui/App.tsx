@@ -43,6 +43,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [pendingConversationId, setPendingConversationId] = useState<string | null>(null);
   const isStreamingRef = useRef(false);
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
@@ -51,12 +52,16 @@ export default function App() {
     : null;
   const selectedProject = projects.find((p) => p.id === selectedProjectId) ?? null;
   const filterProjectId = sidebarView === "chats" ? null : selectedProjectId;
-  const visibleConversations = conversations.filter((c) => c.project_id === filterProjectId);
+  const visibleConversations = conversations.filter(
+    (c) => c.project_id === filterProjectId && c.id !== pendingConversationId
+  );
   const showingProjectList = sidebarView === "projects" && !selectedProject;
   const sortedProjects = [...projects].sort(
     (a, b) => (b.is_builtin ? 1 : 0) - (a.is_builtin ? 1 : 0)
   );
-  const favoriteConversations = conversations.filter((c) => c.is_favorite);
+  const favoriteConversations = conversations.filter(
+    (c) => c.is_favorite && c.id !== pendingConversationId
+  );
 
   useEffect(() => {
     refreshConversations();
@@ -94,10 +99,19 @@ export default function App() {
   }
 
   async function handleNewChat() {
-    const { data } = await createConversation("New chat", filterProjectId);
-    if (data) {
-      await refreshConversations();
-      router.push(`/c/${data.id}`);
+    // Project-scoped chats need a row to attach to right away since
+    // ProjectDetail has no composer of its own; plain "New chat" just
+    // drops the user on the empty home composer — sendMessage() creates
+    // the conversation lazily once they actually send something.
+    if (filterProjectId) {
+      const { data } = await createConversation("New chat", filterProjectId);
+      if (data) {
+        setPendingConversationId(data.id);
+        await refreshConversations();
+        router.push(`/c/${data.id}`);
+      }
+    } else {
+      router.push("/");
     }
     setMobileSidebarOpen(false);
   }
@@ -138,7 +152,7 @@ export default function App() {
 
     let conversationId = activeId;
     let pastContext: string | undefined;
-    const isNewConversation = !conversationId;
+    const isFirstMessage = messages.length === 0;
     if (!conversationId) {
       const { data } = await createConversation(text.slice(0, 60), filterProjectId);
       if (!data) {
@@ -146,6 +160,7 @@ export default function App() {
         return;
       }
       conversationId = data.id;
+      setPendingConversationId(conversationId);
       await refreshConversations();
       router.push(`/c/${conversationId}`);
       pastContext = await getPastContext(conversationId);
@@ -198,12 +213,16 @@ export default function App() {
 
       await saveMessage(conversationId, "assistant", assistantContent);
 
-      if (isNewConversation && assistantContent) {
+      if (isFirstMessage && assistantContent) {
         generateAndSetTitle(conversationId, text, assistantContent);
       }
     } catch {
       appendToLast("⚠️ Could not reach the server.");
     } finally {
+      if (isFirstMessage) {
+        setPendingConversationId(null);
+        refreshConversations();
+      }
       setIsStreaming(false);
       isStreamingRef.current = false;
     }

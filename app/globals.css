@@ -102,7 +102,13 @@ body {
   filter: blur(8px);
   opacity: 0.6;
 }
-.axon-lattice > * {
+/* :not(.sticky) — position:sticky (used by the chat header) is already a
+   "positioned" element per the CSS stacking spec, so it paints above the
+   absolutely-positioned ::before without help. Promoting it to `relative`
+   here too would win the cascade tie (this rule is emitted after
+   @tailwind utilities) and silently downgrade it from sticky to relative,
+   which is exactly what happened before this exclusion was added. */
+.axon-lattice > *:not(.sticky) {
   position: relative;
   z-index: 1;
 }

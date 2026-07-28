@@ -24,7 +24,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SessionContext.Provider value={session}>
       <ThemeProvider>
-        <div className="h-dvh">{children}</div>
+        <div className="h-svh">{children}</div>
       </ThemeProvider>
     </SessionContext.Provider>
   );

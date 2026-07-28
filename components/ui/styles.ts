@@ -28,7 +28,8 @@ export const styles = {
   },
 
   textField: {
-    base: "w-full rounded-btn border border-hairline bg-surface px-[11px] py-[9px] text-sm text-primary placeholder:text-muted focus:border-accent focus:outline-none",
+    // text-base (16px) below sm: prevents iOS Safari's auto-zoom-on-focus.
+    base: "w-full rounded-btn border border-hairline bg-surface px-[11px] py-[9px] text-base text-primary placeholder:text-muted focus:border-accent focus:outline-none sm:text-sm",
   },
 
   sidebar: {
@@ -71,7 +72,7 @@ export const styles = {
   chat: {
     // `axon-lattice` (globals.css) draws the blurred diagonal background.
     main: "safe-top axon-lattice relative flex h-full min-w-0 flex-1 flex-col",
-    header: "flex h-14 min-h-14 items-center gap-3 border-b border-hairline px-6",
+    header: "sticky top-0 z-10 flex h-14 min-h-14 shrink-0 items-center gap-3 border-b border-hairline bg-app px-6",
     menuButton: "text-muted hover:text-secondary sm:hidden",
     headerTitle: "max-w-[70%] truncate text-sm font-semibold text-primary",
     projectBadge: "rounded-full border border-hairline px-2 py-0.5 text-[11px] text-muted",
@@ -104,8 +105,10 @@ export const styles = {
     composerInner:
       "flex w-full max-w-[720px] items-end gap-[10px] rounded-card border border-hairline bg-surface p-[11px_14px]",
 
+    // text-base (16px) below sm: prevents iOS Safari's auto-zoom-on-focus;
+    // desktop keeps the spec's 14.5px via the sm: override.
     textarea:
-      "max-h-[160px] flex-1 resize-none border-none bg-transparent font-sans text-[14.5px] leading-[1.5] text-primary outline-none placeholder:text-muted",
+      "max-h-[160px] flex-1 resize-none border-none bg-transparent font-sans text-base leading-[1.5] text-primary outline-none placeholder:text-muted sm:text-[14.5px]",
     sendBtn: (active: boolean) =>
       "cursor-pointer whitespace-nowrap rounded-send px-4 py-2 text-[13.5px] font-semibold text-white transition-colors " +
       (active ? "bg-accent hover:bg-[color-mix(in_srgb,var(--accent)_85%,white)]" : "bg-hairline"),
@@ -149,9 +152,10 @@ export const styles = {
     title: "text-base font-semibold text-primary",
     fieldGroup: "flex flex-col gap-1.5",
     label: "text-xs font-medium text-secondary",
-    input: "rounded-btn border border-hairline bg-surface px-[11px] py-[9px] font-sans text-sm text-primary outline-none focus:border-accent",
+    // text-base (16px) below sm: prevents iOS Safari's auto-zoom-on-focus.
+    input: "rounded-btn border border-hairline bg-surface px-[11px] py-[9px] font-sans text-base text-primary outline-none focus:border-accent sm:text-sm",
     textarea:
-      "resize-none rounded-btn border border-hairline bg-surface px-[11px] py-[9px] font-sans text-sm text-primary outline-none focus:border-accent",
+      "resize-none rounded-btn border border-hairline bg-surface px-[11px] py-[9px] font-sans text-base text-primary outline-none focus:border-accent sm:text-sm",
     error: "text-sm text-red-400",
     actions: "mt-1 flex justify-end gap-2.5",
     cancelBtn: "cursor-pointer rounded-btn px-4 py-2 text-[13.5px] font-semibold text-secondary hover:bg-surface",
@@ -202,7 +206,7 @@ export const styles = {
   },
 
   auth: {
-    wrap: "flex h-dvh items-center justify-center px-5",
+    wrap: "flex h-svh items-center justify-center px-5",
     panel: "w-full max-w-sm rounded-card border border-hairline bg-surface p-6",
     headerRow: "mb-6 flex items-center gap-[9px]",
     heading: "mb-4 text-lg font-semibold text-primary",

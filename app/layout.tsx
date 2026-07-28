@@ -23,9 +23,15 @@ export const metadata: Metadata = {
 // home indicator (needed since it's added to the home screen as a
 // standalone PWA) — the safe-* utility classes in globals.css pad
 // content back away from those areas.
+// maximumScale/userScalable lock zoom at 100% — this is a chat app, not
+// a document; without it, mobile Safari auto-zooms in on any input with
+// a font-size under 16px, which is also why composer/dialog inputs are
+// text-base (16px) below sm: instead of their desktop size.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -36,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="min-h-dvh bg-app font-sans text-primary antialiased">
+      <body className="min-h-svh bg-app font-sans text-primary antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>
