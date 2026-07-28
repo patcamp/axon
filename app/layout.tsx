@@ -36,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="min-h-dvh bg-ink-app font-sans text-content antialiased">
+      <body className="min-h-dvh bg-app font-sans text-primary antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

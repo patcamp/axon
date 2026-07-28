@@ -15,7 +15,7 @@ const components: Components = {
   ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
   li: ({ children }) => <li>{children}</li>,
   blockquote: ({ children }) => (
-    <blockquote className="mb-2 border-l-2 border-ink-border pl-3 text-content-muted last:mb-0">
+    <blockquote className="mb-2 border-l-2 border-hairline pl-3 text-muted last:mb-0">
       {children}
     </blockquote>
   ),
@@ -48,11 +48,11 @@ const components: Components = {
     </div>
   ),
   th: ({ children }) => (
-    <th className="border border-ink-border px-2 py-1 text-xs font-medium text-content-muted">
+    <th className="border border-hairline px-2 py-1 text-xs font-medium text-muted">
       {children}
     </th>
   ),
-  td: ({ children }) => <td className="border border-ink-border px-2 py-1">{children}</td>,
+  td: ({ children }) => <td className="border border-hairline px-2 py-1">{children}</td>,
 };
 
 export default function Markdown({ content }: { content: string }) {

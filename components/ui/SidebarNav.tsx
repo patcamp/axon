@@ -17,11 +17,11 @@ export default function SidebarNav({
   return (
     <nav className={styles.sidebar.nav}>
       <button onClick={onSelectChats} className={styles.sidebar.navItem(view === "chats")}>
-        <ChatIcon className="text-content-muted" />
+        <ChatIcon className="text-muted" />
         Chats
       </button>
       <button onClick={onSelectProjects} className={styles.sidebar.navItem(view === "projects")}>
-        <FolderIcon className="text-content-muted" />
+        <FolderIcon className="text-muted" />
         Projects
       </button>
     </nav>

@@ -26,6 +26,18 @@
   --text-muted: oklch(0.58 0.01 264);
 }
 
+/* Derived accent tints, named once so no component re-types the color-mix
+   recipe (see design/Axon_STYLE_INTEGRATION.md). Both the desktop sidebar
+   and the mobile drawer are the same component, so this covers both. */
+@layer utilities {
+  .bg-accent-active {
+    background: color-mix(in srgb, var(--accent) 22%, var(--bg-sidebar));
+  }
+  .bg-user-bubble {
+    background: color-mix(in srgb, var(--accent) 55%, black);
+  }
+}
+
 /* Lock the document to the viewport so iOS can't scroll the whole
    page (and drag the header off-screen) when the keyboard opens in
    standalone/PWA mode — only .chat-scroll should ever scroll. */
