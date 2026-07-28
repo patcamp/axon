@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens — switched by the `data-theme` attribute on <html>
+   (see components/ui/theme.tsx) and consumed via tailwind.config.ts.
+   --accent is set inline by ThemeProvider from the user's chosen swatch. */
+:root {
+  --bg-app: oklch(0.15 0.006 264);
+  --bg-sidebar: oklch(0.125 0.006 264);
+  --bg-surface: oklch(0.19 0.008 264);
+  --border: oklch(0.32 0.01 264 / 0.5);
+  --text-primary: oklch(0.96 0.003 264);
+  --text-secondary: oklch(0.75 0.006 264);
+  --text-muted: oklch(0.55 0.01 264);
+  --accent: #7c5cff;
+}
+
+:root[data-theme="light"] {
+  --bg-app: oklch(0.985 0.003 264);
+  --bg-sidebar: oklch(0.96 0.004 264);
+  --bg-surface: oklch(0.93 0.005 264);
+  --border: oklch(0.85 0.006 264);
+  --text-primary: oklch(0.2 0.006 264);
+  --text-secondary: oklch(0.42 0.01 264);
+  --text-muted: oklch(0.58 0.01 264);
+}
+
 /* Lock the document to the viewport so iOS can't scroll the whole
    page (and drag the header off-screen) when the keyboard opens in
    standalone/PWA mode — only .chat-scroll should ever scroll. */
@@ -10,6 +34,7 @@ body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  background: var(--bg-app);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -24,7 +49,7 @@ body {
   width: 8px;
 }
 .chat-scroll::-webkit-scrollbar-thumb {
-  background: #252b39;
+  background: var(--border);
   border-radius: 9999px;
 }
 
@@ -35,4 +60,63 @@ body {
 }
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Subtle diagonal lattice behind the empty-state / conversation content
+   area, blurred and radially masked toward the edges. */
+.axon-lattice {
+  position: relative;
+}
+.axon-lattice::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* A faint tint of the foreground color (not --border, which is used
+     at full strength for visible hairline dividers elsewhere) so the
+     hatch stays subtle in both themes. */
+  background-image: repeating-linear-gradient(
+      60deg,
+      color-mix(in srgb, var(--text-primary) 10%, transparent) 0 1px,
+      transparent 2px 40px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      color-mix(in srgb, var(--text-primary) 10%, transparent) 0 1px,
+      transparent 2px 40px
+    );
+  -webkit-mask-image: radial-gradient(ellipse 55% 45% at 50% 35%, black 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 45% at 50% 35%, black 0%, transparent 75%);
+  filter: blur(8px);
+  opacity: 0.6;
+}
+.axon-lattice > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* "Thinking" placeholder dots */
+.axon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: axonDotPulse 1.2s infinite;
+}
+@keyframes axonDotPulse {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+
+/* CSS-drawn folder icon tab (see components/ui/icons.tsx) */
+.axon-folder-icon::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -3px;
+  width: 6px;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+  border: 1.5px solid currentColor;
+  border-bottom: none;
 }

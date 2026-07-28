@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: oklch(0.15 0.006 264); font-family: 'Inter', system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: oklch(0.3 0.01 264); border-radius: 4px; }
+    a { color: oklch(0.72 0.15 296); }
+    a:hover { color: oklch(0.78 0.15 296); }
+    @keyframes dotPulse { 0%,80%,100% { opacity: 0.25; } 40% { opacity: 1; } }
+  </style>
+</helmet>
+
+<div style="display:flex; width:100%; height:100vh; background:var(--bg-app); color:var(--text-primary); overflow:hidden; --bg-app:{{ cssVars.bgApp }}; --bg-sidebar:{{ cssVars.bgSidebar }}; --bg-surface:{{ cssVars.bgSurface }}; --border:{{ cssVars.border }}; --text-primary:{{ cssVars.textPrimary }}; --text-secondary:{{ cssVars.textSecondary }}; --text-muted:{{ cssVars.textMuted }}; --accent:{{ cssVars.accent }};">
+
+  <div style="width:264px; min-width:264px; height:100%; background:var(--bg-sidebar); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:18px 14px;">
+    <div style="display:flex; align-items:center; gap:9px; padding:4px 6px 20px 6px;">
+      <div style="width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px color-mix(in srgb, var(--accent) 70%, transparent);"></div>
+      <div style="font-weight:600; font-size:15px; letter-spacing:0.01em;">Axon</div>
+    </div>
+
+    <div onClick="{{ onNewPrimary }}" style="display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:8px; background:var(--accent); color:white; font-size:13.5px; font-weight:600; cursor:pointer; margin-bottom:22px;" style-hover="background:color-mix(in srgb, var(--accent) 85%, white);">
+      <span style="font-size:15px; line-height:1;">+</span>
+      <span>{{ newPrimaryLabel }}</span>
+    </div>
+
+    <div onClick="{{ onShowChats }}" style="display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:7px; font-size:13px; color:var(--text-secondary); cursor:pointer; margin-bottom:4px; background:{{ chatsNavBg }};" style-hover="background:var(--bg-surface);">
+      <span style="width:14px; height:12px; border-radius:7px 7px 7px 2px; border:1.5px solid var(--text-muted); display:inline-block;"></span>
+      <span>Chats</span>
+    </div>
+
+    <div onClick="{{ onShowProjects }}" style="display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:7px; font-size:13px; color:var(--text-secondary); cursor:pointer; margin-bottom:16px; background:{{ projectsNavBg }};" style-hover="background:var(--bg-surface);">
+      <span style="position:relative; width:14px; height:11px; border-radius:0 2px 2px 2px; border:1.5px solid var(--text-muted); display:inline-block; margin-top:2px;" style-before="content:''; position:absolute; left:0; top:-3px; width:6px; height:3px; border-radius:2px 2px 0 0; border:1.5px solid var(--text-muted); border-bottom:none;"></span>
+      <span>Projects</span>
+    </div>
+
+    <sc-if value="{{ isChatsView }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.06em; color:var(--text-muted); text-transform:uppercase; padding:0 10px 8px 10px;">Chats</div>
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+        <sc-for list="{{ chats }}" as="chat" hint-placeholder-count="3">
+          <div onClick="{{ chat.onSelect }}" style="padding:9px 10px; border-radius:7px; font-size:13px; color:var(--text-secondary); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:{{ chat.bg }};" style-hover="background:var(--bg-surface);">
+            {{ chat.title }}
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProjectsView }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.06em; color:var(--text-muted); text-transform:uppercase; padding:0 10px 8px 10px;">Projects</div>
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+        <sc-for list="{{ projects }}" as="project" hint-placeholder-count="2">
+          <div onClick="{{ project.onSelect }}" style="display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:7px; font-size:13px; color:var(--text-secondary); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" style-hover="background:var(--bg-surface);">
+            <span style="position:relative; width:13px; height:10px; border-radius:0 2px 2px 2px; border:1.5px solid var(--text-muted); display:inline-block; flex-shrink:0; margin-top:2px;" style-before="content:''; position:absolute; left:0; top:-3px; width:5px; height:3px; border-radius:2px 2px 0 0; border:1.5px solid var(--text-muted); border-bottom:none;"></span>
+            {{ project.title }}
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:12px; position:relative;">
+      <sc-if value="{{ showProfileMenu }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ onCloseProfileMenu }}" style="position:fixed; inset:0; z-index:40;"></div>
+        <div style="position:absolute; bottom:calc(100% + 6px); left:0; width:100%; background:var(--bg-surface); border:1px solid var(--border); border-radius:9px; padding:5px; z-index:41; box-shadow:0 10px 30px oklch(0.05 0.01 264 / 0.4);">
+          <div style="padding:8px 10px; border-radius:6px; font-size:13px; color:var(--text-primary); cursor:pointer;" style-hover="background:var(--bg-sidebar);">Sign out</div>
+        </div>
+      </sc-if>
+      <div onClick="{{ onToggleProfileMenu }}" style="display:flex; align-items:center; gap:10px; cursor:pointer; border-radius:8px; padding:4px;" style-hover="background:var(--bg-surface);">
+        <div style="width:28px; height:28px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; flex-shrink:0;">PC</div>
+        <div style="font-size:12.5px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">patrickcampfield@gmail.com</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1; display:flex; flex-direction:column; min-width:0; height:100%; position:relative;" style-before="content:''; position:absolute; inset:0; pointer-events:none; background-image:repeating-linear-gradient(60deg, var(--border) 0 1px, transparent 2px 40px), repeating-linear-gradient(-60deg, var(--border) 0 1px, transparent 2px 40px); mask-image:radial-gradient(ellipse 75% 65% at 50% 40%, black 30%, transparent 85%); -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 40%, black 30%, transparent 85%); filter:blur(5px); opacity:0.9;">
+
+    <div style="height:56px; min-height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--border);">
+      <div style="font-size:14px; font-weight:600; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">{{ headerTitle }}</div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:oklch(0.55 0.13 145); font-weight:500;">
+        <div style="width:6px; height:6px; border-radius:50%; background:oklch(0.65 0.15 145);"></div>
+        ready
+      </div>
+    </div>
+
+    <sc-if value="{{ isProjectDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; overflow-y:auto; display:flex; justify-content:center; padding:40px 24px;">
+        <div style="max-width:640px; width:100%; display:flex; flex-direction:column; gap:18px;">
+          <div onClick="{{ onBackToProjects }}" style="font-size:12.5px; color:var(--text-secondary); cursor:pointer; width:fit-content;" style-hover="color:var(--text-primary);">← All projects</div>
+          <div style="font-size:26px; font-weight:600; color:var(--text-primary);">{{ activeProject.title }}</div>
+          <div style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">{{ activeProject.description }}</div>
+          <div style="border-top:1px solid var(--border); margin-top:8px; padding-top:24px; display:flex; flex-direction:column; align-items:center; gap:10px; color:var(--text-muted); font-size:13.5px;">
+            No chats in this project yet.
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px; padding:24px;">
+        <div style="font-size:24px; font-weight:600; color:var(--text-primary);">What can I help with?</div>
+        <div style="width:100%; max-width:640px;">
+          <div style="display:flex; align-items:flex-end; gap:10px; background:var(--bg-surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px;">
+            <textarea value="{{ draft }}" onChange="{{ onDraftChange }}" onKeyDown="{{ onKeyDown }}" placeholder="Message Axon..." rows="3" style="flex:1; resize:none; background:transparent; border:none; outline:none; color:var(--text-primary); font-family:inherit; font-size:14.5px; line-height:1.5; max-height:160px;"></textarea>
+            <div onClick="{{ onSend }}" style="padding:8px 16px; border-radius:9px; background:{{ sendBg }}; color:white; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap;">Send</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasConversation }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column;">
+        <div style="max-width:720px; width:100%; margin:0 auto; padding:28px 24px 12px 24px; display:flex; flex-direction:column; gap:18px;">
+          <sc-for list="{{ messages }}" as="msg" hint-placeholder-count="2">
+            <div style="display:flex; justify-content:{{ msg.justify }};">
+              <div style="max-width:78%; padding:11px 15px; border-radius:14px; background:{{ msg.bg }}; color:{{ msg.color }}; font-size:14.5px; line-height:1.55; white-space:pre-wrap;">{{ msg.text }}</div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ isThinking }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; justify-content:flex-start;">
+              <div style="padding:11px 15px; border-radius:14px; background:var(--bg-surface); display:flex; gap:5px;">
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--text-muted); animation:dotPulse 1.2s infinite;"></div>
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--text-muted); animation:dotPulse 1.2s infinite 0.15s;"></div>
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--text-muted); animation:dotPulse 1.2s infinite 0.3s;"></div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div style="padding:14px 24px 22px 24px; display:flex; justify-content:center;">
+        <div style="width:100%; max-width:720px; display:flex; align-items:flex-end; gap:10px; background:var(--bg-surface); border:1px solid var(--border); border-radius:14px; padding:11px 14px;">
+          <textarea value="{{ draft }}" onChange="{{ onDraftChange }}" onKeyDown="{{ onKeyDown }}" placeholder="Message Axon..." rows="3" style="flex:1; resize:none; background:transparent; border:none; outline:none; color:var(--text-primary); font-family:inherit; font-size:14.5px; line-height:1.5; max-height:160px;"></textarea>
+          <div onClick="{{ onSend }}" style="padding:8px 16px; border-radius:9px; background:{{ sendBg }}; color:white; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap;">Send</div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <sc-if value="{{ showNewProjectModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseNewProject }}" style="position:fixed; inset:0; background:oklch(0.1 0.006 264 / 0.6); display:flex; align-items:center; justify-content:center; z-index:50;">
+      <div onClick="{{ stopPropagation }}" style="width:420px; max-width:90vw; background:var(--bg-sidebar); border:1px solid var(--border); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:16px; box-shadow:0 20px 60px oklch(0.05 0.01 264 / 0.5);">
+        <div style="font-size:16px; font-weight:600; color:var(--text-primary);">New project</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:12px; font-weight:500; color:var(--text-secondary);">Name</div>
+          <input value="{{ newProjectName }}" onChange="{{ onNewProjectNameChange }}" placeholder="Project name" style="background:var(--bg-surface); border:1px solid var(--border); border-radius:8px; padding:9px 11px; color:var(--text-primary); font-family:inherit; font-size:14px; outline:none;"></input>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:12px; font-weight:500; color:var(--text-secondary);">Description (optional)</div>
+          <textarea value="{{ newProjectDesc }}" onChange="{{ onNewProjectDescChange }}" placeholder="What is this project about?" rows="3" style="resize:none; background:var(--bg-surface); border:1px solid var(--border); border-radius:8px; padding:9px 11px; color:var(--text-primary); font-family:inherit; font-size:14px; outline:none;"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:4px;">
+          <div onClick="{{ onCloseNewProject }}" style="padding:8px 16px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--text-secondary); cursor:pointer;" style-hover="background:var(--bg-surface);">Cancel</div>
+          <div onClick="{{ onCreateProject }}" style="padding:8px 16px; border-radius:8px; background:{{ createBg }}; color:white; font-size:13.5px; font-weight:600; cursor:pointer;">Create project</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#7C5CFF&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#7C5CFF&quot;, &quot;#3B82F6&quot;, &quot;#10B981&quot;, &quot;#F59E0B&quot;, &quot;#EC4899&quot;, &quot;#EF4444&quot;, &quot;#06B6D4&quot;, &quot;#6366F1&quot;, &quot;#84CC16&quot;, &quot;#14B8A6&quot;], &quot;section&quot;: &quot;Theme&quot;},
+  &quot;mode&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;dark&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;dark&quot;, &quot;light&quot;], &quot;section&quot;: &quot;Theme&quot;}
+}">
+class Component extends DCLogic {
+  state = {
+    chats: [
+      { id: 'c1', title: 'What is the traveling salesman problem', messages: [
+        { role: 'user', text: 'What is the traveling salesman problem?' },
+        { role: 'assistant', text: 'The traveling salesman problem (TSP) asks for the shortest possible route that visits a set of cities exactly once and returns to the start. It shows up in:\n\n- Logistics: delivery and vehicle routing\n- Operations Research: scheduling and route planning for complex systems\n- Computer Science: testing and benchmarking algorithms' },
+        { role: 'user', text: 'How is this model llama-3.1-8b at coding' },
+        { role: 'assistant', text: 'Llama-3.1-8b is a solid general-purpose model for coding tasks.\n\nStrengths: understands and generates code across most popular languages, completes snippets accurately, and can flag common bugs.\n\nWeaknesses: struggles with highly context-dependent or idiomatic code, and its suggestions are not always the most optimal solution for complex problems.' }
+      ]},
+      { id: 'c2', title: 'Is GeoGuessr only free for the...', messages: [
+        { role: 'user', text: 'Is GeoGuessr only free for the first few rounds?' },
+        { role: 'assistant', text: 'Yes — GeoGuessr offers a limited number of free rounds per day for guests and free accounts. A paid subscription (GeoGuessr Pro) removes that cap and unlocks additional maps and modes.' }
+      ]}
+    ],
+    projects: [
+      { id: 'p1', title: 'Budget', description: 'Track monthly spend, forecast cash flow, and plan upcoming purchases.' },
+      { id: 'p2', title: 'Stock Analysis', description: 'Research and compare equities, earnings, and market trends.' }
+    ],
+    activeChatId: null,
+    activeProjectId: null,
+    draft: '',
+    isThinking: false,
+    view: 'chats',
+    showNewProjectModal: false,
+    newProjectName: '',
+    newProjectDesc: ''
+  };
+
+  onNewChat = () => this.setState({ activeChatId: null, activeProjectId: null, draft: '', isThinking: false, view: 'chats' });
+
+  getTheme() {
+    const mode = this.props.mode ?? 'dark';
+    return mode === 'light' ? {
+      bgApp: 'oklch(0.985 0.003 264)', bgSidebar: 'oklch(0.96 0.004 264)', bgSurface: 'oklch(0.93 0.005 264)',
+      border: 'oklch(0.85 0.006 264)', textPrimary: 'oklch(0.2 0.006 264)', textSecondary: 'oklch(0.42 0.01 264)', textMuted: 'oklch(0.58 0.01 264)'
+    } : {
+      bgApp: 'oklch(0.15 0.006 264)', bgSidebar: 'oklch(0.125 0.006 264)', bgSurface: 'oklch(0.19 0.008 264)',
+      border: 'oklch(0.32 0.01 264 / 0.5)', textPrimary: 'oklch(0.96 0.003 264)', textSecondary: 'oklch(0.75 0.006 264)', textMuted: 'oklch(0.55 0.01 264)'
+    };
+  }
+  onShowChats = () => this.setState({ view: 'chats', activeProjectId: null });
+  onShowProjects = () => this.setState({ view: 'projects' });
+  onSelectProject = (id) => this.setState({ activeProjectId: id, activeChatId: null });
+  onToggleProfileMenu = () => this.setState(s => ({ showProfileMenu: !s.showProfileMenu }));
+  onCloseProfileMenu = () => this.setState({ showProfileMenu: false });
+  onOpenNewProject = () => this.setState({ showNewProjectModal: true, newProjectName: '', newProjectDesc: '' });
+  onCloseNewProject = () => this.setState({ showNewProjectModal: false });
+  onNewProjectNameChange = (e) => this.setState({ newProjectName: e.target.value });
+  onNewProjectDescChange = (e) => this.setState({ newProjectDesc: e.target.value });
+  onCreateProject = () => {
+    const name = this.state.newProjectName.trim();
+    if (!name) return;
+    this.setState(s => ({
+      projects: [...s.projects, { id: 'p' + Date.now(), title: name }],
+      showNewProjectModal: false
+    }));
+  };
+  onSelectChat = (id) => this.setState({ activeChatId: id, activeProjectId: null, draft: '', isThinking: false });
+  onDraftChange = (e) => this.setState({ draft: e.target.value });
+
+  onKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.onSend(); }
+  };
+
+  onSend = () => {
+    const text = this.state.draft.trim();
+    if (!text) return;
+    let { chats, activeChatId } = this.state;
+    if (!activeChatId) {
+      const id = 'c' + Date.now();
+      const title = text.length > 42 ? text.slice(0, 42) + '…' : text;
+      chats = [{ id, title, messages: [] }, ...chats];
+      activeChatId = id;
+    }
+    chats = chats.map(c => c.id === activeChatId ? { ...c, messages: [...c.messages, { role: 'user', text }] } : c);
+    this.setState({ chats, activeChatId, draft: '', isThinking: true });
+    setTimeout(() => {
+      this.setState(s => ({
+        chats: s.chats.map(c => c.id === activeChatId ? { ...c, messages: [...c.messages, { role: 'assistant', text: 'This is a prototype response — connect a model to generate real answers here.' }] } : c),
+        isThinking: false
+      }));
+    }, 1100);
+  };
+
+  renderVals() {
+    const { chats, projects, activeChatId, activeProjectId, draft, isThinking, view, showNewProjectModal, newProjectName, newProjectDesc } = this.state;
+    const activeChat = chats.find(c => c.id === activeChatId) || null;
+    const activeProject = projects.find(p => p.id === activeProjectId) || null;
+    const projectItems = projects.map(p => ({ id: p.id, title: p.title, onSelect: () => this.onSelectProject(p.id) }));
+    const chatItems = chats.map(c => ({
+      id: c.id, title: c.title,
+      bg: c.id === activeChatId ? 'color-mix(in srgb, var(--accent) 22%, var(--bg-sidebar))' : 'transparent',
+      onSelect: () => this.onSelectChat(c.id)
+    }));
+    const messages = activeChat ? activeChat.messages.map(m => ({
+      text: m.text,
+      justify: m.role === 'user' ? 'flex-end' : 'flex-start',
+      bg: m.role === 'user' ? 'color-mix(in srgb, var(--accent) 55%, black)' : 'var(--bg-surface)',
+      color: m.role === 'user' ? 'white' : 'var(--text-primary)'
+    })) : [];
+    return {
+      chats: chatItems,
+      projects: projectItems,
+      isEmpty: !activeChat && !activeProject,
+      hasConversation: !!activeChat,
+      isProjectDetail: !!activeProject,
+      activeProject,
+      onBackToProjects: () => this.setState({ activeProjectId: null }),
+      headerTitle: activeChat ? activeChat.title : (activeProject ? activeProject.title : 'New chat'),
+      messages,
+      isThinking,
+      draft,
+      onDraftChange: this.onDraftChange,
+      onKeyDown: this.onKeyDown,
+      onSend: this.onSend,
+      onNewChat: this.onNewChat,
+      onShowChats: this.onShowChats,
+      onShowProjects: this.onShowProjects,
+      isChatsView: view === 'chats',
+      isProjectsView: view === 'projects',
+      chatsNavBg: view === 'chats' ? 'color-mix(in srgb, var(--accent) 22%, var(--bg-sidebar))' : 'transparent',
+      projectsNavBg: view === 'projects' ? 'color-mix(in srgb, var(--accent) 22%, var(--bg-sidebar))' : 'transparent',
+      newPrimaryLabel: view === 'projects' ? 'New project' : 'New chat',
+      onNewPrimary: view === 'projects' ? this.onOpenNewProject : this.onNewChat,
+      sendBg: draft.trim() ? 'var(--accent)' : 'var(--border)',
+      cssVars: { ...this.getTheme(), accent: this.props.accentColor ?? '#7C5CFF' },
+      showNewProjectModal,
+      newProjectName,
+      newProjectDesc,
+      onNewProjectNameChange: this.onNewProjectNameChange,
+      onNewProjectDescChange: this.onNewProjectDescChange,
+      onCloseNewProject: this.onCloseNewProject,
+      onCreateProject: this.onCreateProject,
+      createDisabled: !newProjectName.trim(),
+      createBg: newProjectName.trim() ? 'var(--accent)' : 'var(--border)',
+      stopPropagation: (e) => e.stopPropagation(),
+      showProfileMenu: this.state.showProfileMenu,
+      onToggleProfileMenu: this.onToggleProfileMenu,
+      onCloseProfileMenu: this.onCloseProfileMenu
+    };
+  }
+}
+
+</script>
+</body>
+</html>

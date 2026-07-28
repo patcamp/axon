@@ -1,5 +1,8 @@
 import type { Config } from "tailwindcss";
 
+// Colors are CSS custom properties (set in globals.css / theme.tsx) rather
+// than static hex values, so the whole app can flip dark/light and swap the
+// user's accent color at runtime. See components/ui/CLAUDE.md.
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,20 +11,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        accent: "var(--accent)",
         ink: {
-          950: "#0b0d12",
-          900: "#11141b",
-          800: "#1a1e28",
-          700: "#252b39",
-          600: "#3a4256",
+          app: "var(--bg-app)",
+          sidebar: "var(--bg-sidebar)",
+          surface: "var(--bg-surface)",
+          border: "var(--border)",
         },
-        accent: {
-          DEFAULT: "#7c6cff",
-          soft: "#9a8dff",
+        content: {
+          DEFAULT: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
         },
       },
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["var(--font-inter)", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
     },

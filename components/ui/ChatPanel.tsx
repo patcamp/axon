@@ -3,12 +3,15 @@ import { ChatMessage } from "./chatTypes";
 import MessageList from "./MessageList";
 import Composer from "./Composer";
 import ChatTitleMenu from "./ChatTitleMenu";
+import ProjectDetail from "./ProjectDetail";
 import { MenuIcon } from "./icons";
 import { styles } from "./styles";
 
 export default function ChatPanel({
   activeConversation,
   activeProject,
+  viewedProject,
+  onBackToProjects,
   projects,
   isStreaming,
   messages,
@@ -23,6 +26,8 @@ export default function ChatPanel({
 }: {
   activeConversation: Conversation | null;
   activeProject: Project | null;
+  viewedProject: Project | null;
+  onBackToProjects: () => void;
   projects: Project[];
   isStreaming: boolean;
   messages: ChatMessage[];
@@ -35,6 +40,12 @@ export default function ChatPanel({
   onSetConversationProject: (id: string, projectId: string | null) => void;
   onDeleteConversation: (id: string) => void;
 }) {
+  const headerTitle = activeConversation
+    ? activeConversation.title
+    : viewedProject
+      ? viewedProject.name
+      : "New chat";
+
   return (
     <main className={styles.chat.main}>
       <header className={styles.chat.header}>
@@ -42,7 +53,7 @@ export default function ChatPanel({
           <MenuIcon />
         </button>
 
-        {activeConversation && (
+        {activeConversation ? (
           <ChatTitleMenu
             conversation={activeConversation}
             projects={projects}
@@ -53,15 +64,47 @@ export default function ChatPanel({
             onSetProject={(projectId) => onSetConversationProject(activeConversation.id, projectId)}
             onDelete={() => onDeleteConversation(activeConversation.id)}
           />
+        ) : (
+          <div className={styles.chat.headerTitle}>{headerTitle}</div>
         )}
 
         {activeProject && <span className={styles.chat.projectBadge}>{activeProject.name}</span>}
-        <span className={styles.chat.status}>{isStreaming ? "thinking…" : "ready"}</span>
+
+        <span className={styles.chat.statusWrap}>
+          <span className={styles.chat.statusDot} />
+          {isStreaming ? "thinking…" : "ready"}
+        </span>
       </header>
 
-      <MessageList messages={messages} />
-
-      <Composer value={input} onChange={onInputChange} onSend={onSend} disabled={isStreaming} />
+      {viewedProject ? (
+        <ProjectDetail project={viewedProject} onBack={onBackToProjects} />
+      ) : !activeConversation ? (
+        <div className={styles.chat.emptyWrap}>
+          <div className={styles.chat.emptyHeading}>What can I help with?</div>
+          <div className={styles.chat.emptyComposerOuter}>
+            <Composer
+              value={input}
+              onChange={onInputChange}
+              onSend={onSend}
+              disabled={isStreaming}
+              barClassName={styles.chat.emptyComposerInner}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
+          <MessageList messages={messages} />
+          <div className={styles.chat.composerWrap}>
+            <Composer
+              value={input}
+              onChange={onInputChange}
+              onSend={onSend}
+              disabled={isStreaming}
+              barClassName={styles.chat.composerInner}
+            />
+          </div>
+        </>
+      )}
     </main>
   );
 }

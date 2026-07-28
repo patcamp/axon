@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSession, onAuthChange, AuthSession } from "@/components/api/auth";
 import { SessionContext } from "@/components/ui/session";
+import { ThemeProvider } from "@/components/ui/theme";
 import AuthScreen from "@/components/ui/AuthScreen";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -22,7 +23,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionContext.Provider value={session}>
-      <div className="h-dvh">{children}</div>
+      <ThemeProvider>
+        <div className="h-dvh">{children}</div>
+      </ThemeProvider>
     </SessionContext.Provider>
   );
 }

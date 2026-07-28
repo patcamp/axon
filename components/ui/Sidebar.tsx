@@ -62,7 +62,8 @@ export default function Sidebar({
 
         <div className={styles.sidebar.newButtonWrap}>
           <Button
-            variant="outline"
+            variant="primary"
+            size="sm"
             fullWidth
             onClick={showingProjectList ? onNewProject : onNewChat}
           >

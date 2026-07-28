@@ -24,6 +24,9 @@ yarn-error.log*
 .env.local
 .env*.local
 
+# local test account credentials
+TESTING.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

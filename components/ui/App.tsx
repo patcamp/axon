@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { Conversation, Project } from "@/lib/types";
 import {
   listConversations,
@@ -20,19 +21,29 @@ import { SidebarView } from "./SidebarNav";
 import Sidebar from "./Sidebar";
 import ChatPanel from "./ChatPanel";
 import NewProjectDialog from "./NewProjectDialog";
+import SettingsView from "./SettingsView";
+import { MenuIcon } from "./icons";
+import { styles } from "./styles";
 
 export default function App() {
   const session = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams<{ id?: string }>();
+
+  const isSettingsView = pathname === "/settings";
+  const sidebarView: SidebarView = pathname.startsWith("/projects") ? "projects" : "chats";
+  const activeId = sidebarView === "chats" ? (params.id ?? null) : null;
+  const selectedProjectId = sidebarView === "projects" ? (params.id ?? null) : null;
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [sidebarView, setSidebarView] = useState<SidebarView>("chats");
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showNewProject, setShowNewProject] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const isStreamingRef = useRef(false);
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
   const activeProject = activeConversation
@@ -63,42 +74,43 @@ export default function App() {
       setMessages([]);
       return;
     }
+    if (isStreamingRef.current) return;
     listMessages(activeId).then(({ data }) => {
       setMessages(data.map((m) => ({ role: m.role, content: m.content })));
     });
   }, [activeId]);
 
-  async function refreshConversations(selectId?: string) {
+  async function refreshConversations() {
     const { data } = await listConversations();
     setConversations(data);
-    if (selectId) setActiveId(selectId);
   }
 
   function selectChatsView() {
-    setSidebarView("chats");
-    setSelectedProjectId(null);
+    router.push("/");
   }
 
   function selectProjectsView() {
-    setSidebarView("projects");
-    setSelectedProjectId(null);
+    router.push("/projects");
   }
 
   async function handleNewChat() {
     const { data } = await createConversation("New chat", filterProjectId);
-    if (data) refreshConversations(data.id);
+    if (data) {
+      await refreshConversations();
+      router.push(`/c/${data.id}`);
+    }
     setMobileSidebarOpen(false);
   }
 
   async function handleDeleteChat(id: string) {
     await deleteConversation(id);
-    if (activeId === id) setActiveId(null);
+    if (activeId === id) router.push("/");
     refreshConversations();
   }
 
   async function handleDeleteProject(id: string) {
     await deleteProject(id);
-    if (selectedProjectId === id) setSelectedProjectId(null);
+    if (selectedProjectId === id) router.push("/projects");
     setProjects((p) => p.filter((proj) => proj.id !== id));
     refreshConversations();
   }
@@ -122,13 +134,20 @@ export default function App() {
     const text = input.trim();
     if (!text || isStreaming) return;
 
+    isStreamingRef.current = true;
+
     let conversationId = activeId;
     let pastContext: string | undefined;
+    const isNewConversation = !conversationId;
     if (!conversationId) {
       const { data } = await createConversation(text.slice(0, 60), filterProjectId);
-      if (!data) return;
+      if (!data) {
+        isStreamingRef.current = false;
+        return;
+      }
       conversationId = data.id;
-      await refreshConversations(conversationId);
+      await refreshConversations();
+      router.push(`/c/${conversationId}`);
       pastContext = await getPastContext(conversationId);
     }
 
@@ -178,10 +197,37 @@ export default function App() {
       }
 
       await saveMessage(conversationId, "assistant", assistantContent);
+
+      if (isNewConversation && assistantContent) {
+        generateAndSetTitle(conversationId, text, assistantContent);
+      }
     } catch {
       appendToLast("⚠️ Could not reach the server.");
     } finally {
       setIsStreaming(false);
+      isStreamingRef.current = false;
+    }
+  }
+
+  async function generateAndSetTitle(
+    conversationId: string,
+    userMessage: string,
+    assistantMessage: string
+  ) {
+    try {
+      const res = await fetch("/api/title", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userMessage, assistantMessage }),
+      });
+      if (!res.ok) return;
+      const { title } = await res.json();
+      if (title) {
+        await renameConversation(conversationId, title);
+        refreshConversations();
+      }
+    } catch {
+      // Keep the fallback title (first 60 chars of the message) on failure.
     }
   }
 
@@ -216,39 +262,53 @@ export default function App() {
         onSelectProjectsView={selectProjectsView}
         onNewChat={handleNewChat}
         onNewProject={() => setShowNewProject(true)}
-        onSelectProject={setSelectedProjectId}
+        onSelectProject={(id) => router.push(`/projects/${id}`)}
         onDeleteProject={handleDeleteProject}
-        onBackFromProject={() => setSelectedProjectId(null)}
+        onBackFromProject={() => router.push("/projects")}
         onSelectConversation={(id) => {
-          setActiveId(id);
+          router.push(`/c/${id}`);
           setMobileSidebarOpen(false);
         }}
         onDeleteConversation={handleDeleteChat}
         onSignOut={() => signOut()}
       />
 
-      <ChatPanel
-        activeConversation={activeConversation}
-        activeProject={activeProject}
-        projects={sortedProjects}
-        isStreaming={isStreaming}
-        messages={messages}
-        input={input}
-        onInputChange={setInput}
-        onSend={sendMessage}
-        onOpenMenu={() => setMobileSidebarOpen(true)}
-        onRenameConversation={handleRenameConversation}
-        onToggleFavorite={handleToggleFavorite}
-        onSetConversationProject={handleSetConversationProject}
-        onDeleteConversation={handleDeleteChat}
-      />
+      {isSettingsView ? (
+        <main className={styles.chat.main}>
+          <header className={styles.chat.header}>
+            <button onClick={() => setMobileSidebarOpen(true)} className={styles.chat.menuButton}>
+              <MenuIcon />
+            </button>
+            <div className={styles.chat.headerTitle}>Settings</div>
+          </header>
+          <SettingsView />
+        </main>
+      ) : (
+        <ChatPanel
+          activeConversation={activeConversation}
+          activeProject={activeProject}
+          viewedProject={sidebarView === "projects" ? selectedProject : null}
+          onBackToProjects={() => router.push("/projects")}
+          projects={sortedProjects}
+          isStreaming={isStreaming}
+          messages={messages}
+          input={input}
+          onInputChange={setInput}
+          onSend={sendMessage}
+          onOpenMenu={() => setMobileSidebarOpen(true)}
+          onRenameConversation={handleRenameConversation}
+          onToggleFavorite={handleToggleFavorite}
+          onSetConversationProject={handleSetConversationProject}
+          onDeleteConversation={handleDeleteChat}
+        />
+      )}
 
       {showNewProject && (
         <NewProjectDialog
           onClose={() => setShowNewProject(false)}
           onCreated={(project) => {
             setProjects((p) => [project, ...p]);
-            setSelectedProjectId(project.id);
+            router.push(`/projects/${project.id}`);
             setShowNewProject(false);
             setMobileSidebarOpen(false);
           }}

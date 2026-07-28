@@ -62,3 +62,17 @@ alter table conversations add column is_favorite boolean not null default false;
 -- existing database, run:
 --   drop function if exists public.verify_access_token(text);
 --   drop table if exists access_tokens;
+
+-- Per-user UI preferences (theme + accent color) from the Axon redesign,
+-- one row per user so they follow the user across devices.
+create table user_settings (
+  user_id uuid primary key references auth.users(id) on delete cascade default auth.uid(),
+  theme text not null default 'dark' check (theme in ('dark', 'light')),
+  accent_color text not null default '#7C5CFF',
+  updated_at timestamptz not null default now()
+);
+
+alter table user_settings enable row level security;
+
+create policy "Own row" on user_settings for all
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);

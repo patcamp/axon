@@ -1,19 +1,28 @@
 // Hoisted to module scope — components defined inside a component body
 // get a new identity every render.
 
-export function ChatIcon() {
+// Chat bubble + folder are drawn with CSS borders (no SVG), per the design
+// spec — a 14px box with one squared-off corner reads as a speech bubble;
+// the folder is a box plus a small tab pseudo-element (.axon-folder-icon
+// in globals.css). Both pick up `currentColor`, so set text color on a
+// parent/className to theme them.
+export function ChatIcon({ className = "" }: { className?: string }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-    </svg>
+    <span
+      className={["inline-block h-3 w-3.5 shrink-0 rounded-[7px_7px_7px_2px] border-[1.5px] border-current", className].join(" ")}
+    />
   );
 }
 
-export function FolderIcon() {
+export function FolderIcon({ className = "", size = "md" }: { className?: string; size?: "md" | "sm" }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
-    </svg>
+    <span
+      className={[
+        "axon-folder-icon relative top-px inline-block shrink-0 rounded-[0_2px_2px_2px] border-[1.5px] border-current",
+        size === "sm" ? "h-[10px] w-[13px]" : "h-[11px] w-[14px]",
+        className,
+      ].join(" ")}
+    />
   );
 }
 

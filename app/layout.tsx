@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import AppShell from "./AppShell";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Axon",
@@ -28,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-ink-950 text-slate-100 antialiased">
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-dvh bg-ink-app font-sans text-content antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

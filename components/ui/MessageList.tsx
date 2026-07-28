@@ -14,12 +14,14 @@ export default function MessageList({ messages }: { messages: ChatMessage[] }) {
 
   return (
     <div ref={scrollRef} className={styles.chat.scrollArea}>
-      {messages.length === 0 && (
-        <div className={styles.chat.emptyState}>Ask anything to get started.</div>
-      )}
-      {messages.map((m, i) => (
-        <MessageBubble key={i} message={m} />
-      ))}
+      <div className={styles.chat.messagesInner}>
+        {messages.length === 0 && (
+          <div className={styles.chat.emptyState}>Ask anything to get started.</div>
+        )}
+        {messages.map((m, i) => (
+          <MessageBubble key={i} message={m} />
+        ))}
+      </div>
     </div>
   );
 }

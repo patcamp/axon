@@ -24,3 +24,12 @@ export interface Message {
   content: string;
   created_at: string;
 }
+
+export type ThemeMode = "dark" | "light";
+
+export interface UserSettings {
+  user_id: string;
+  theme: ThemeMode;
+  accent_color: string;
+  updated_at: string;
+}

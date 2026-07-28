@@ -1,6 +1,5 @@
 "use client";
 
-import Button from "./common/Button";
 import { styles } from "./styles";
 
 export default function Composer({
@@ -8,32 +7,40 @@ export default function Composer({
   onChange,
   onSend,
   disabled,
+  barClassName,
 }: {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
   disabled: boolean;
+  // The bordered/rounded bar look differs slightly between the empty
+  // state and the pinned conversation composer — see styles.chat.
+  barClassName: string;
 }) {
+  const hasText = value.trim().length > 0;
+
   return (
-    <div className={styles.chat.composerWrap}>
-      <div className={styles.chat.composerRow}>
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              onSend();
-            }
-          }}
-          rows={1}
-          placeholder="Message…"
-          className={styles.chat.textarea}
-        />
-        <Button size="lg" onClick={onSend} disabled={disabled || !value.trim()}>
-          Send
-        </Button>
-      </div>
+    <div className={barClassName}>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            onSend();
+          }
+        }}
+        rows={3}
+        placeholder="Message Axon..."
+        className={styles.chat.textarea}
+      />
+      <button
+        onClick={onSend}
+        disabled={disabled || !hasText}
+        className={styles.chat.sendBtn(hasText && !disabled)}
+      >
+        Send
+      </button>
     </div>
   );
 }

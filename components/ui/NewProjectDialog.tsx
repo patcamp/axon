@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { createProject } from "@/components/api/projects";
 import { Project } from "@/lib/types";
-import Button from "@/components/ui/common/Button";
-import TextField from "@/components/ui/common/TextField";
 import { styles } from "@/components/ui/styles";
 
 export default function NewProjectDialog({
@@ -35,40 +33,52 @@ export default function NewProjectDialog({
   }
 
   return (
-    <div className={styles.dialog.overlay}>
-      <form onSubmit={handleSubmit} className={styles.dialog.panel}>
-        <h2 className={styles.dialog.title}>New project</h2>
+    <div className={styles.dialog.overlay} onClick={onClose}>
+      <form
+        onSubmit={handleSubmit}
+        onClick={(e) => e.stopPropagation()}
+        className={styles.dialog.panel}
+      >
+        <div className={styles.dialog.title}>New project</div>
 
-        <label className={styles.dialog.label}>Name</label>
-        <TextField
-          autoFocus
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Trip planning"
-          className="mb-4"
-        />
+        <div className={styles.dialog.fieldGroup}>
+          <label className={styles.dialog.label}>Name</label>
+          <input
+            autoFocus
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Project name"
+            className={styles.dialog.input}
+          />
+        </div>
 
-        <label className={styles.dialog.label}>
-          Standing instructions — applied to every chat in this project
-        </label>
-        <textarea
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          rows={6}
-          placeholder="e.g. Always answer in metric units. Keep responses under 100 words."
-          className={styles.dialog.textarea}
-        />
+        <div className={styles.dialog.fieldGroup}>
+          <label className={styles.dialog.label}>
+            Description (optional) — standing instructions applied to every chat in this project
+          </label>
+          <textarea
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            rows={3}
+            placeholder="What is this project about?"
+            className={styles.dialog.textarea}
+          />
+        </div>
 
         {error && <p className={styles.dialog.error}>{error}</p>}
 
         <div className={styles.dialog.actions}>
-          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+          <div onClick={onClose} className={styles.dialog.cancelBtn}>
             Cancel
-          </Button>
-          <Button type="submit" size="sm" disabled={submitting || !name.trim()}>
+          </div>
+          <button
+            type="submit"
+            disabled={submitting || !name.trim()}
+            className={styles.dialog.submitBtn(!submitting && !!name.trim())}
+          >
             {submitting ? "Creating…" : "Create project"}
-          </Button>
+          </button>
         </div>
       </form>
     </div>
