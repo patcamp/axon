@@ -1,5 +1,5 @@
-import { CloseIcon } from "./icons";
-import { styles } from "./styles";
+import { CloseIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function SidebarHeader({ onClose }: { onClose: () => void }) {
   return (

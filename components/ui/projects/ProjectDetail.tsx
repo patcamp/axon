@@ -1,5 +1,5 @@
 import { Project } from "@/lib/types";
-import { styles } from "./styles";
+import { styles } from "@/components/ui/styles";
 
 export default function ProjectDetail({
   project,

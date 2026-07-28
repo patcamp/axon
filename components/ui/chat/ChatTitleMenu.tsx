@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Conversation, Project } from "@/lib/types";
-import { ChevronDownIcon, StarIcon, PencilIcon, FolderIcon, TrashIcon } from "./icons";
-import { styles } from "./styles";
+import { ChevronDownIcon, StarIcon, PencilIcon, FolderIcon, TrashIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function ChatTitleMenu({
   conversation,

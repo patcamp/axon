@@ -4,12 +4,12 @@ import { Conversation, Project } from "@/lib/types";
 import { AuthSession } from "@/components/api/auth";
 import SidebarHeader from "./SidebarHeader";
 import SidebarNav, { SidebarView } from "./SidebarNav";
-import ProjectList from "./ProjectList";
+import ProjectList from "@/components/ui/projects/ProjectList";
 import ConversationList from "./ConversationList";
 import AccountFooter from "./AccountFooter";
-import Button from "./common/Button";
-import { PlusIcon } from "./icons";
-import { styles } from "./styles";
+import Button from "@/components/ui/common/Button";
+import { PlusIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function Sidebar({
   isOpen,

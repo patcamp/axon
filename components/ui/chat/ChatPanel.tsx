@@ -3,9 +3,9 @@ import { ChatMessage } from "./chatTypes";
 import MessageList from "./MessageList";
 import Composer from "./Composer";
 import ChatTitleMenu from "./ChatTitleMenu";
-import ProjectDetail from "./ProjectDetail";
-import { MenuIcon } from "./icons";
-import { styles } from "./styles";
+import ProjectDetail from "@/components/ui/projects/ProjectDetail";
+import { MenuIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function ChatPanel({
   activeConversation,

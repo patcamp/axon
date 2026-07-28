@@ -1,7 +1,7 @@
 "use client";
 
-import { ChatIcon, FolderIcon } from "./icons";
-import { styles } from "./styles";
+import { ChatIcon, FolderIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export type SidebarView = "chats" | "projects";
 

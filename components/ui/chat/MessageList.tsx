@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ChatMessage } from "./chatTypes";
 import MessageBubble from "./MessageBubble";
-import { styles } from "./styles";
+import { styles } from "@/components/ui/styles";
 
 export default function MessageList({ messages }: { messages: ChatMessage[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);

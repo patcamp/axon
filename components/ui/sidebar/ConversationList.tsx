@@ -1,8 +1,8 @@
 "use client";
 
 import { Conversation, Project } from "@/lib/types";
-import { BackIcon, StarIcon } from "./icons";
-import { styles } from "./styles";
+import { BackIcon, StarIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function ConversationList({
   conversations,

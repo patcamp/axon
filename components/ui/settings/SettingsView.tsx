@@ -1,8 +1,8 @@
 "use client";
 
 import { ACCENT_SWATCHES } from "@/components/api/settings";
-import { useTheme } from "./theme";
-import { styles } from "./styles";
+import { useTheme } from "@/components/ui/theme";
+import { styles } from "@/components/ui/styles";
 
 export default function SettingsView() {
   const { theme, accentColor, setTheme, setAccentColor } = useTheme();

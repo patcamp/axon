@@ -1,8 +1,8 @@
 "use client";
 
 import { Project } from "@/lib/types";
-import { FolderIcon } from "./icons";
-import { styles } from "./styles";
+import { FolderIcon } from "@/components/ui/icons";
+import { styles } from "@/components/ui/styles";
 
 export default function ProjectList({
   projects,

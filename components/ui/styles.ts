@@ -60,7 +60,7 @@ export const styles = {
       (active ? "bg-accent-active" : "hover:bg-surface"),
     rowLabel: "truncate",
     rowLabelWithIcon: "flex items-center gap-2 truncate",
-    rowDelete: "ml-2 hidden text-muted hover:text-red-400 group-hover:inline",
+    rowDelete: "ml-2 text-muted hover:text-red-400",
     backButton: "mb-2 flex items-center gap-1 px-[10px] text-xs text-secondary hover:text-primary",
     footerWrap: "relative mt-3 border-t border-hairline pt-3",
     footerRow: "flex w-full items-center gap-2.5 rounded-lg px-1 py-2 text-left hover:bg-surface",

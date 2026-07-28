@@ -1,6 +1,6 @@
 import Markdown from "./Markdown";
 import { ChatMessage } from "./chatTypes";
-import { styles } from "./styles";
+import { styles } from "@/components/ui/styles";
 
 export default function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";

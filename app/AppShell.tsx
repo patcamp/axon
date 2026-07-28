@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSession, onAuthChange, AuthSession } from "@/components/api/auth";
 import { SessionContext } from "@/components/ui/session";
 import { ThemeProvider } from "@/components/ui/theme";
-import AuthScreen from "@/components/ui/AuthScreen";
+import AuthScreen from "@/components/ui/auth/AuthScreen";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);

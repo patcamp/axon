@@ -16,12 +16,12 @@ import { listProjects, deleteProject, ensureBudgetProject } from "@/components/a
 import { buildBudgetContext } from "@/components/api/budget";
 import { signOut } from "@/components/api/auth";
 import { useSession } from "./session";
-import { ChatMessage } from "./chatTypes";
-import { SidebarView } from "./SidebarNav";
-import Sidebar from "./Sidebar";
-import ChatPanel from "./ChatPanel";
-import NewProjectDialog from "./NewProjectDialog";
-import SettingsView from "./SettingsView";
+import { ChatMessage } from "@/components/ui/chat/chatTypes";
+import { SidebarView } from "@/components/ui/sidebar/SidebarNav";
+import Sidebar from "@/components/ui/sidebar/Sidebar";
+import ChatPanel from "@/components/ui/chat/ChatPanel";
+import NewProjectDialog from "@/components/ui/projects/NewProjectDialog";
+import SettingsView from "@/components/ui/settings/SettingsView";
 import { MenuIcon } from "./icons";
 import { styles } from "./styles";
 
@@ -32,9 +32,8 @@ export default function App() {
   const params = useParams<{ id?: string }>();
 
   const isSettingsView = pathname === "/settings";
-  const sidebarView: SidebarView = pathname.startsWith("/projects") ? "projects" : "chats";
-  const activeId = sidebarView === "chats" ? (params.id ?? null) : null;
-  const selectedProjectId = sidebarView === "projects" ? (params.id ?? null) : null;
+  const isProjectsRoute = pathname.startsWith("/projects");
+  const activeId = isProjectsRoute ? null : (params.id ?? null);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -50,6 +49,13 @@ export default function App() {
   const activeProject = activeConversation
     ? projects.find((p) => p.id === activeConversation.project_id) ?? null
     : null;
+  // Stay on the "projects" sidebar both when browsing /projects/[id] directly
+  // and when inside a chat that belongs to a project, so opening a project's
+  // chat doesn't bounce the sidebar back to the unfiled chats list.
+  const selectedProjectId = isProjectsRoute
+    ? (params.id ?? null)
+    : (activeConversation?.project_id ?? null);
+  const sidebarView: SidebarView = isProjectsRoute || selectedProjectId ? "projects" : "chats";
   const selectedProject = projects.find((p) => p.id === selectedProjectId) ?? null;
   const filterProjectId = sidebarView === "chats" ? null : selectedProjectId;
   const visibleConversations = conversations.filter(
@@ -306,7 +312,7 @@ export default function App() {
         <ChatPanel
           activeConversation={activeConversation}
           activeProject={activeProject}
-          viewedProject={sidebarView === "projects" ? selectedProject : null}
+          viewedProject={!activeConversation ? selectedProject : null}
           onBackToProjects={() => router.push("/projects")}
           projects={sortedProjects}
           isStreaming={isStreaming}

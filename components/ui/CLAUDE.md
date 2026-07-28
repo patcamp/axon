@@ -4,11 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Structure
 
+Components are grouped by feature area into subfolders; only cross-cutting files (`App.tsx`, `icons.tsx`, `styles.ts`, `theme.tsx`, `session.ts`) sit directly in `components/ui/`. Within a feature folder, siblings import each other with relative paths (`./Foo`); anything reaching into another folder or a top-level file uses the `@/components/ui/...` absolute alias — never `../`.
+
+- **`chat/`** — `ChatPanel`, `ChatTitleMenu`, `Composer`, `MessageList`, `MessageBubble`, `Markdown`, and `chatTypes.ts`.
+- **`sidebar/`** — `Sidebar` (desktop rail + mobile drawer, same component), `SidebarHeader`, `SidebarNav`, `ConversationList`, `AccountFooter`.
+- **`projects/`** — `ProjectList`, `ProjectDetail`, `NewProjectDialog`.
+- **`settings/`** — `SettingsView`.
+- **`auth/`** — `AuthScreen`.
+- **`common/`** holds generic, style-driven primitives (`Button`, `TextField`) that take `variant`/`size` props mapped to `styles.ts` recipes plus a passthrough `className`. Reach for these instead of writing new ad hoc `<button>`/`<input>` elements.
+
+Top-level files:
 - **`App.tsx` owns all state.** Conversations, projects, sidebar view/selection, active chat messages, and the streaming flag all live here as `useState`. `Sidebar`, `ChatPanel`, and the dialogs underneath them are presentational — they receive data and callbacks as props and call `components/api/*` only indirectly through handlers passed down from `App.tsx`. When adding a feature, prefer lifting new state into `App.tsx` over introducing local state that needs to sync with it.
 - **Chat streaming lives in `App.tsx#sendMessage`.** It POSTs to `/api/chat`, reads the response body with `res.body.getReader()`, and appends each decoded chunk to the last message in `messages` via `appendToLast` (mutates a placeholder empty assistant message added right before the fetch). Any change to streaming behavior (e.g. cancellation, error formatting) belongs here, not in `ChatPanel`.
-- **`common/`** holds generic, style-driven primitives (`Button`, `TextField`) that take `variant`/`size` props mapped to `styles.ts` recipes plus a passthrough `className`. Reach for these instead of writing new ad hoc `<button>`/`<input>` elements.
 - **`session.ts`** exposes the Supabase auth session via a `useSession()` hook — the only way components should read the current user.
-- **`chatTypes.ts`** defines `ChatMessage` (`{ role, content }`), the shape used for in-memory chat state — distinct from `lib/types.ts`'s `Message`, which is the persisted DB row.
+- **`chat/chatTypes.ts`** defines `ChatMessage` (`{ role, content }`), the shape used for in-memory chat state — distinct from `lib/types.ts`'s `Message`, which is the persisted DB row.
 
 ## Styling
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { styles } from "./styles";
+import { styles } from "@/components/ui/styles";
 
 export default function Composer({
   value,

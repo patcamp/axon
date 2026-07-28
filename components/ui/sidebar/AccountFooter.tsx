@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthSession } from "@/components/api/auth";
-import { styles } from "./styles";
+import { styles } from "@/components/ui/styles";
 
 export default function AccountFooter({
   session,
