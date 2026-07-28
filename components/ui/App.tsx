@@ -33,7 +33,14 @@ export default function App() {
 
   const isSettingsView = pathname === "/settings";
   const isProjectsRoute = pathname.startsWith("/projects");
-  const activeId = isProjectsRoute ? null : (params.id ?? null);
+  // Derived from pathname rather than useParams: sendMessage() moves onto a
+  // fresh conversation with native history.pushState (see comment there), and
+  // usePathname tracks that while useParams does not.
+  const activeId = isProjectsRoute
+    ? null
+    : pathname.startsWith("/c/")
+      ? pathname.slice(3)
+      : (params.id ?? null);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -168,7 +175,12 @@ export default function App() {
       conversationId = data.id;
       setPendingConversationId(conversationId);
       await refreshConversations();
-      router.push(`/c/${conversationId}`);
+      // Native pushState, NOT router.push: each page renders its own <App/>,
+      // so a router navigation would remount App mid-stream and orphan the
+      // reply until reload. Next 14 syncs usePathname/useParams with the
+      // History API, so this keeps the same instance (and its streaming
+      // state) alive while the URL updates.
+      window.history.pushState(null, "", `/c/${conversationId}`);
       pastContext = await getPastContext(conversationId);
     }
 

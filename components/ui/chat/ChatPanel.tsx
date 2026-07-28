@@ -93,7 +93,7 @@ export default function ChatPanel({
         </div>
       ) : (
         <>
-          <MessageList messages={messages} />
+          <MessageList messages={messages} isStreaming={isStreaming} />
           <div className={styles.chat.composerWrap}>
             <Composer
               value={input}

@@ -164,6 +164,34 @@ export const styles = {
       (active ? "bg-accent hover:bg-[color-mix(in_srgb,var(--accent)_85%,white)]" : "bg-hairline"),
   },
 
+  // Artifact preview: clickable card in place of large html/jsx code blocks,
+  // plus the fullscreen Preview/Code modal it opens.
+  artifact: {
+    card: (generating: boolean) =>
+      "mb-2 flex w-full items-center gap-3 rounded-card border border-hairline bg-surface px-4 py-3 text-left last:mb-0 " +
+      (generating ? "cursor-default" : "cursor-pointer hover:border-accent"),
+    cardIcon:
+      "flex h-9 w-9 shrink-0 items-center justify-center rounded-btn bg-accent-active text-accent",
+    cardTitle: "truncate text-sm font-medium text-primary",
+    cardMeta: "text-xs text-muted",
+    overlay: "fixed inset-0 z-50 flex items-center justify-center bg-[oklch(0.1_0.006_264_/_0.6)] px-3 sm:px-5",
+    panel:
+      "flex h-[85vh] w-[90vw] max-w-[1100px] flex-col overflow-hidden rounded-card border border-hairline bg-sidebar shadow-[0_20px_60px_oklch(0.05_0.01_264_/_0.5)]",
+    header: "flex min-h-12 items-center gap-3 border-b border-hairline px-4",
+    headerTitle: "min-w-0 flex-1 truncate text-sm font-semibold text-primary",
+    tabRow: "flex gap-1",
+    tab: (active: boolean) =>
+      "cursor-pointer rounded-btn px-3 py-1.5 text-[13px] font-medium transition-colors " +
+      (active
+        ? "border border-accent bg-[color-mix(in_srgb,var(--accent)_16%,var(--bg-surface))] text-primary"
+        : "border border-transparent text-secondary hover:bg-surface"),
+    copyBtn: "cursor-pointer rounded-btn px-3 py-1.5 text-[13px] text-secondary hover:bg-surface",
+    closeBtn: "cursor-pointer px-1 text-muted hover:text-secondary",
+    body: "min-h-0 flex-1",
+    iframe: "h-full w-full border-0 bg-white",
+    codeScroll: "h-full overflow-auto p-4 font-mono text-[0.85em] text-primary",
+  },
+
   // Dedicated settings view (theme + accent swatches), reachable from the
   // profile popover.
   settings: {

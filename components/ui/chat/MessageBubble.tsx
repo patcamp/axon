@@ -2,7 +2,13 @@ import Markdown from "./Markdown";
 import { ChatMessage } from "./chatTypes";
 import { styles } from "@/components/ui/styles";
 
-export default function MessageBubble({ message }: { message: ChatMessage }) {
+export default function MessageBubble({
+  message,
+  streaming = false,
+}: {
+  message: ChatMessage;
+  streaming?: boolean;
+}) {
   const isUser = message.role === "user";
 
   if (!isUser && !message.content) {
@@ -21,7 +27,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={isUser ? styles.chat.rowUser : styles.chat.rowAssistant}>
       <div className={isUser ? styles.chat.bubbleUser : styles.chat.bubbleAssistant}>
-        {isUser ? message.content : <Markdown content={message.content} />}
+        {isUser ? message.content : <Markdown content={message.content} streaming={streaming} />}
       </div>
     </div>
   );

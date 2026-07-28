@@ -5,7 +5,13 @@ import { ChatMessage } from "./chatTypes";
 import MessageBubble from "./MessageBubble";
 import { styles } from "@/components/ui/styles";
 
-export default function MessageList({ messages }: { messages: ChatMessage[] }) {
+export default function MessageList({
+  messages,
+  isStreaming = false,
+}: {
+  messages: ChatMessage[];
+  isStreaming?: boolean;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,7 +25,11 @@ export default function MessageList({ messages }: { messages: ChatMessage[] }) {
           <div className={styles.chat.emptyState}>Ask anything to get started.</div>
         )}
         {messages.map((m, i) => (
-          <MessageBubble key={i} message={m} />
+          <MessageBubble
+            key={i}
+            message={m}
+            streaming={isStreaming && i === messages.length - 1 && m.role === "assistant"}
+          />
         ))}
       </div>
     </div>
